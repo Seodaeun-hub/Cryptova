@@ -1,0 +1,2 @@
+# Copy this file to api_key.txt and replace the value. Do not commit api_key.txt.
+marketaux_api_key=replace-with-your-marketaux-api-key

@@ -21,6 +21,7 @@ apikey pass.txt
 # Python 소스는 추적하고, 학습 가중치·생성 데이터만 제외한다.
 cryptova-ai/models/
 cryptova-ai/data/**/*.csv
+cryptova-ai/data/news/processed/news_latest_preprocess_metadata.json
 
 # Mac / Windows
 .DS_Store

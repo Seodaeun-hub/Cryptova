@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+numpy
+pandas
+requests
+python-dateutil
+tqdm
+torch
+transformers

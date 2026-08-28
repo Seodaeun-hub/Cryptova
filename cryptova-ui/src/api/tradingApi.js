@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://127.0.0.1:8000";
+import { API_BASE_URL } from "./config";
 
 function getToken() {
   return localStorage.getItem("access_token");
@@ -60,7 +60,7 @@ export async function getAutoTradingStatus() {
 export async function runTradingOnce() {
   const token = localStorage.getItem("access_token");
 
-  const response = await fetch("http://127.0.0.1:8000/trading/run-once", {
+  const response = await fetch(`${API_BASE_URL}/trading/run-once`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -68,7 +68,7 @@ export async function runTradingOnce() {
     },
     body: JSON.stringify({
       symbol: "BTCUSDT",
-      dry_run: false,
+      dry_run: true,
     }),
   });
 
@@ -85,7 +85,7 @@ export async function getPaperPortfolioSummary(symbol = "BTCUSDT") {
   const token = localStorage.getItem("access_token");
 
   const response = await fetch(
-    `http://127.0.0.1:8000/positions/paper-portfolio?symbol=${symbol}`,
+    `${API_BASE_URL}/positions/paper-portfolio?symbol=${symbol}`,
     {
       method: "GET",
       headers: {

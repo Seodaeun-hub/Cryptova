@@ -91,7 +91,7 @@ backtest_results
 
 ## 5. 백엔드 환경 변수 설정
 
-`cryptova-back` 폴더에 `.env` 파일을 생성합니다.
+`cryptova-back/.env.example`을 복사해 `cryptova-back/.env` 파일을 생성합니다. `.env`는 개인별 설정 파일이므로 Git에 올리지 않습니다.
 
 ```env
 APP_NAME=Cryptova
@@ -106,15 +106,19 @@ JWT_ACCESS_TOKEN_EXPIRE_MINUTES=60
 AUTO_TRADING_INTERVAL_MINUTES=60
 
 GEMINI_API_KEY=본인_GEMINI_API_KEY
-BYBIT_PUBLIC_BASE=https://api.bybit.com
+AI_SERVER_URL=http://127.0.0.1:8001
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
 ```
 
 주의사항은 다음과 같습니다.
 
 - `DATABASE_URL`의 MySQL 비밀번호는 본인 환경에 맞게 수정해야 합니다.
+- MySQL 비밀번호에 `@`, `:`, `/` 등 URL 예약 문자가 있으면 URL 인코딩해서 넣어야 합니다.
+- `ENCRYPTION_KEY`는 거래소 API 키 암호화에 사용합니다. PowerShell에서 `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`로 생성한 값을 넣습니다.
 - `GEMINI_API_KEY`가 없으면 Gemini Explanation 대신 fallback 설명을 사용할 수 있습니다.
 - `AUTO_TRADING_INTERVAL_MINUTES`는 자동매매 실행 주기입니다.
 - 테스트용으로는 1분, 일반 실행용으로는 60분을 권장합니다.
+- 프론트엔드를 배포하면 배포된 화면 주소를 `CORS_ORIGINS`에 추가합니다.
 
 ---
 
@@ -191,11 +195,15 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-만약 `requirements.txt`가 없다면 아래 주요 패키지를 직접 설치합니다.
+AI 신호 생성에는 아래 파일도 필요합니다. 학습 가중치와 생성 데이터는 용량 및 키 관리 문제로 Git에서 제외되어 있으므로, 별도 보관본에서 복원해야 합니다.
 
-```powershell
-pip install fastapi uvicorn pandas numpy torch scikit-learn
+```text
+cryptova-ai/models/best_model.pt
+cryptova-ai/data/merged/latest_merged_features.csv
+cryptova-ai/chart_only/timesnet_encoder.py
 ```
+
+최신 뉴스 수집을 사용하려면 `cryptova-ai/api_key.example.txt`를 복사해 `api_key.txt`를 만들고 MarketAux 키를 입력합니다. 이 파일도 절대 Git에 올리지 않습니다.
 
 AI 서버를 실행합니다.
 
@@ -236,6 +244,8 @@ npm install
 ```powershell
 npm run dev
 ```
+
+배포 환경에서는 `cryptova-ui/.env.example`을 복사해 `.env`를 만들고 `VITE_API_BASE_URL`에 배포된 백엔드 주소를 설정합니다.
 
 브라우저에서 다음 주소로 접속합니다.
 
@@ -281,7 +291,7 @@ python -m uvicorn app.main:app --reload
 ```powershell
 cd C:\Users\User\Desktop\Cryptova\cryptova-ai
 .\venv\Scripts\activate
-python -m uvicorn app:app --port 8001 --reload
+python -m uvicorn main:app --port 8001 --reload
 ```
 
 ### 프론트엔드 실행
@@ -341,6 +351,8 @@ Trading 화면에서 `Run Once` 버튼을 클릭합니다.
 3. Paper Entry 생성 또는 HOLD 처리
 4. Trading Runs 저장
 5. History 화면 반영
+
+`/predict/latest`은 호출할 때마다 Bybit·MarketAux에서 최신 데이터를 가져와 전처리와 추론을 수행합니다. 로컬 환경에서 약 20초 이상 걸릴 수 있고, Gemini 설명 생성까지 사용하면 추가 시간이 걸릴 수 있습니다. 화면의 `Run Once`는 기본적으로 `dry_run=true`를 보내므로 실제 주문을 제출하지 않습니다.
 
 백엔드 로그 예시는 다음과 같습니다.
 
