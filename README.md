@@ -200,7 +200,7 @@ pip install fastapi uvicorn pandas numpy torch scikit-learn
 AI 서버를 실행합니다.
 
 ```powershell
-python -m uvicorn app:app --port 8001 --reload
+python -m uvicorn main:app --port 8001 --reload
 ```
 
 정상 실행 주소는 다음과 같습니다.

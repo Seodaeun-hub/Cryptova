@@ -17,9 +17,10 @@ __pycache__/
 api_key.txt
 apikey pass.txt
 
-# AI models
-models/
-chart_only/
+# AI model artifacts
+# 앱의 Python 모듈인 cryptova-back/app/models/는 추적해야 한다.
+cryptova-ai/models/
+cryptova-ai/chart_only/
 
 # Dataset
 data/
