@@ -18,12 +18,9 @@ api_key.txt
 apikey pass.txt
 
 # AI model artifacts
-# 앱의 Python 모듈인 cryptova-back/app/models/는 추적해야 한다.
+# Python 소스는 추적하고, 학습 가중치·생성 데이터만 제외한다.
 cryptova-ai/models/
-cryptova-ai/chart_only/
-
-# Dataset
-data/
+cryptova-ai/data/**/*.csv
 
 # Mac / Windows
 .DS_Store
