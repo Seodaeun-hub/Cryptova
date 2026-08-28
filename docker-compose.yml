@@ -1,0 +1,66 @@
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-cryptova_db}
+      MYSQL_USER: ${MYSQL_USER:-cryptova}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  ai:
+    build: ./cryptova-ai
+    restart: unless-stopped
+    environment:
+      MARKETAUX_API_KEY: ${MARKETAUX_API_KEY:-}
+    volumes:
+      - ./cryptova-ai/data:/workspace/cryptova-ai/data
+      - ./cryptova-ai/models:/workspace/cryptova-ai/models:ro
+
+  backend:
+    build: ./cryptova-back
+    restart: unless-stopped
+    environment:
+      APP_NAME: Cryptova
+      APP_ENV: production
+      DATABASE_URL: mysql+pymysql://${MYSQL_USER:-cryptova}:${MYSQL_PASSWORD}@db:3306/${MYSQL_DATABASE:-cryptova_db}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_ALGORITHM: HS256
+      JWT_ACCESS_TOKEN_EXPIRE_MINUTES: 60
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      AI_SERVER_URL: http://ai:8001
+      AI_DATA_DIR: /shared-ai-data
+      BACKTEST_PREDICTION_PATH: /shared-ai-data/predictions/test_predictions.csv
+      BACKTEST_FEATURE_PATH: /shared-ai-data/merged/merged_with_future_return_funding13.csv
+      AUTO_TRADING_INTERVAL_MINUTES: 60
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      EXPLANATION_MODEL: gemini-2.5-flash
+    volumes:
+      - ./cryptova-ai/data:/shared-ai-data:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      ai:
+        condition: service_started
+
+  ui:
+    build:
+      context: ./cryptova-ui
+      args:
+        VITE_API_BASE_URL: /api
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

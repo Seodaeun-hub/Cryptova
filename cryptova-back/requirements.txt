@@ -30,3 +30,6 @@ typing_extensions==4.15.0
 uvicorn==0.47.0
 google-generativeai
 APScheduler
+httpx
+numpy
+pandas

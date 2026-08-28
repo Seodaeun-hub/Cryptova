@@ -5,6 +5,7 @@ node_modules/
 dist/
 build/
 .env
+.env.production
 
 # Python cache
 __pycache__/

@@ -17,18 +17,13 @@ from app.models.strategy_setting import StrategySetting
 import json
 import google.generativeai as genai
 
-# 현재 파일 위치:
-# cryptova-back/app/routers/signals.py
-# parents[3] = Cryptova 루트 폴더
+# Docker에서는 AI 컨테이너의 data 디렉터리를 /shared-ai-data로 마운트한다.
+# 로컬 개발에서는 기존 프로젝트 구조를 기본값으로 사용한다.
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-
-LATEST_MERGED_PATH = (
-    PROJECT_ROOT
-    / "cryptova-ai"
-    / "data"
-    / "merged"
-    / "latest_merged_features.csv"
+AI_DATA_DIR = Path(
+    os.getenv("AI_DATA_DIR", PROJECT_ROOT / "cryptova-ai" / "data")
 )
+LATEST_MERGED_PATH = AI_DATA_DIR / "merged" / "latest_merged_features.csv"
 
 router = APIRouter(prefix="/signals", tags=["Signals"])
 

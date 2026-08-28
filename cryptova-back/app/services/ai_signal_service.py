@@ -1,6 +1,9 @@
+import os
+
 import requests
 
-AI_SERVER_URL = "http://127.0.0.1:8001"
+
+AI_SERVER_URL = os.getenv("AI_SERVER_URL", "http://127.0.0.1:8001")
 
 
 def request_latest_ai_signal():

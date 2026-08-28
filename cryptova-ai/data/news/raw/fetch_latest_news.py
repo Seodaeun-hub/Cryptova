@@ -17,6 +17,7 @@ marketaux_api_key=여기에_키_값
 data/news/raw/news_raw_latest_marketaux.csv
 """
 
+import os
 import time
 import random
 from pathlib import Path
@@ -44,11 +45,15 @@ SESSION.headers.update({
 
 
 def load_marketaux_api_key(path: Path = API_KEY_PATH) -> str:
+    environment_key = os.getenv("MARKETAUX_API_KEY", "").strip()
+    if environment_key:
+        return environment_key
+
     if not path.exists():
         raise FileNotFoundError(
             f"API key 파일을 찾을 수 없습니다: {path}\n"
-            "프로젝트 최상위 폴더에 api_key.txt를 만들고 "
-            "marketaux_api_key=키값 형태로 저장하세요."
+            "MARKETAUX_API_KEY 환경변수를 설정하거나 프로젝트 최상위 폴더에 "
+            "api_key.txt를 만들고 marketaux_api_key=키값 형태로 저장하세요."
         )
 
     with open(path, "r", encoding="utf-8") as f:
